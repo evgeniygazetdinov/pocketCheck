@@ -8,7 +8,8 @@ import(
   "fmt"
 )
 const BTC = "Bitcoin"
-const RUB = "Russian Ruble"
+const RUB = "RUB"
+const USD = "USD"
 const BitPay = "https://bitpay.com/api/rates"
 const myPocket = 0.01535133
 
@@ -20,14 +21,15 @@ type Rate struct {
     Rate    float32  `json:"rate"`
 }
 
-func getRubleForCalculation(dataForManipulations RatesResponse)float32{
-  var rubCourse float32
+func getRubleForCalculation(dataForManipulations RatesResponse, Cur string)float32{
+  var rates float32
   for _,value := range dataForManipulations{
-    if value.Name == RUB{
-      rubCourse = value.Rate
+    if value.Code == Cur{
+      rates = value.Rate
+      break
     }
   }
- return rubCourse
+  return rates
 }
 
 func calculateInMyPOcket(rubCourse float32 )int{
@@ -51,8 +53,12 @@ func makeResponseFromMarket() RatesResponse{
 }
 
 func main() {
-  rates := makeResponseFromMarket()
-  rubCourse := getRubleForCalculation(rates) 
-  fmt.Println("rusian course is", rubCourse)
-  fmt.Println("currnet in my pocket is ", calculateInMyPOcket(rubCourse))
+  rates:= makeResponseFromMarket()
+  rubCourse := getRubleForCalculation(rates, RUB)
+  usdCourse :=  getRubleForCalculation(rates, USD) 
+  fmt.Println("russian course is", rubCourse)
+  fmt.Println("usd course is", usdCourse)
+
+  fmt.Println("current in my pocket is", RUB , "=", calculateInMyPOcket(rubCourse), "or", USD ,"=",
+   calculateInMyPOcket(usdCourse))
 }
