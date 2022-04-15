@@ -24,7 +24,9 @@ type Rate struct {
 }
 
 type RUBtoUSD struct{
-  value float32 "json: USD_RUB"
+  value string 
+  digit float64
+
 }
 
 func getRubleForCalculation(dataForManipulations RatesResponse, Cur string)float32{
@@ -59,19 +61,20 @@ func makeResponseFromMarket() RatesResponse{
 }
 
 func rubleMarket() float32{
-  var curRUB float32
+  // refactor after
+  course := make(map[string]float32)
   // TODO add coinmarketcap for referense
   resp, err := http.Get(russianRUBtoUSD)
   if err != nil {
       fmt.Println("No response from request")
   }
   defer resp.Body.Close()
-  body, err := ioutil.ReadAll(resp.Body) // response body is []byte
-  errs := json.Unmarshal([]byte(body), &curRUB)
-  if errs != nil {
-      panic(errs)
+  body, err := ioutil.ReadAll(resp.Body)
+  e := json.Unmarshal(body, &course)
+  if e != nil && err != nil {
+      panic(err)
   }
-  return curRUB
+  return course["USD_RUB"]
 }
 
 func main() {
